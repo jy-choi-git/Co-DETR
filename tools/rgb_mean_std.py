@@ -1,7 +1,24 @@
 import cv2
 import numpy as np
 import os
-from tqdm import tqdm
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    TextColumn,
+    TimeElapsedColumn,
+    TimeRemainingColumn,
+)
+
+progress_bar = Progress(
+    TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+    BarColumn(),
+    MofNCompleteColumn(),
+    TextColumn("•"),
+    TimeElapsedColumn(),
+    TextColumn("•"),
+    TimeRemainingColumn(),
+)
 
 def get_rgb_mean_std(image_paths):
   """5만장 정도 되는 이미지의 r, g, b 채널별 평균과 표준편차를 구합니다.
@@ -19,25 +36,25 @@ def get_rgb_mean_std(image_paths):
   r_stds = []
   g_stds = []
   b_stds = []
+  with progress_bar as p:
+    for image_path in p.track(image_paths):
+      image = cv2.imread(image_path)
+      rgb = cv2.split(image)
 
-  for image_path in tqdm(image_paths):
-    image = cv2.imread(image_path)
-    rgb = cv2.split(image)
+      r_mean = np.mean(rgb[0])
+      g_mean = np.mean(rgb[1])
+      b_mean = np.mean(rgb[2])
 
-    r_mean = np.mean(rgb[0])
-    g_mean = np.mean(rgb[1])
-    b_mean = np.mean(rgb[2])
+      r_std = np.std(rgb[0])
+      g_std = np.std(rgb[1])
+      b_std = np.std(rgb[2])
 
-    r_std = np.std(rgb[0])
-    g_std = np.std(rgb[1])
-    b_std = np.std(rgb[2])
-
-    r_means.append(r_mean)
-    g_means.append(g_mean)
-    b_means.append(b_mean)
-    r_stds.append(r_std)
-    g_stds.append(g_std)
-    b_stds.append(b_std)
+      r_means.append(r_mean)
+      g_means.append(g_mean)
+      b_means.append(b_mean)
+      r_stds.append(r_std)
+      g_stds.append(g_std)
+      b_stds.append(b_std)
 
   return np.array(r_means), np.array(g_means), np.array(b_means), np.array(r_stds), np.array(g_stds), np.array(b_stds)
 
