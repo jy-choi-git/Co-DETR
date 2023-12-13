@@ -1,0 +1,2 @@
+PYTHONPATH="$(dirname $0)/..":$PYTHONPATH
+python -m torch.distributed.launch --nproc_per_node=2 train.py /home/jinyoung/GitRepos/detection/Co-DETR/projects/configs/co_deformable_detr/co_deformable_detr_swin_small_3x_fashionpedia.py --launcher pytorch --work-dir /home/jinyoung/GitRepos/detection/Co-DETR/runs/
